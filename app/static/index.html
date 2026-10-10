@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image in-painting · Convex optimization</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/">Convex optimization <small>IMAGE IN-PAINTING</small></a>
+  <div class="header-actions"><button id="import-project">Open</button><button id="save-project">Save</button><a class="help-link" href="#how-to">Help</a></div>
+</header>
+<main>
+  <section class="intro"><h1>Examples: image in-painting</h1><span class="lecture-label">ℓ₂ total variation</span></section>
+  <section class="problem" aria-label="Optimization problem">
+    <div class="problem-formula">
+      <math display="block"><mrow><munder><mo>min</mo><mi>x</mi></munder><mspace width=".8em"/><mi mathvariant="normal">TV</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow></munderover><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></munderover><msub><mrow><mo>‖</mo><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>x</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>,</mo><mi>j</mi></mrow></msub><mo>−</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd></mtr><mtr><mtd><msub><mi>x</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>‖</mo></mrow><mn>2</mn></msub></mrow></math>
+      <math display="block"><mrow><mtext>s.t.</mtext><mspace width=".8em"/><msub><mi>x</mi><mi>ij</mi></msub><mo>=</mo><msubsup><mi>x</mi><mi>ij</mi><mtext>orig</mtext></msubsup><mo>,</mo><mspace width=".5em"/><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>∈</mo><mi>K</mi><mspace width="1em"/><mo>;</mo><mspace width=".6em"/><mn>0</mn><mo>≤</mo><mi>x</mi><mo>≤</mo><mn>1</mn></mrow></math>
+    </div>
+    <div class="problem-key"><p><b>K</b> Known pixel values</p><p><span class="legend-dot orange"></span>Missing pixels</p><small>Normalized intensities; box constraint added.</small></div>
+  </section>
+  <div id="notice" role="status" aria-live="polite" hidden></div>
+  <div class="workspace">
+    <aside class="library" aria-label="Images">
+      <div class="section-head"><h2>Images</h2><span id="image-count">0 / 8</span></div>
+      <button id="upload-button" class="upload-button">＋ Upload</button>
+      <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+      <label class="resolution-label" for="resolution">Resolution</label><select id="resolution"><option value="128">128 px</option><option value="256" selected>256 px</option><option value="512">512 px</option></select>
+      <div id="image-list"></div>
+      <button id="add-example" class="text-button">Add example</button>
+    </aside>
+    <section class="experiment" aria-label="Image in-painting">
+      <div class="experiment-header"><div><h2 id="image-name">Loading…</h2><p id="image-dimensions"></p></div><button id="remove-image" class="text-button danger">Remove</button></div>
+      <div class="work-controls">
+        <div class="draw-controls"><div class="segmented" aria-label="Drawing tools"><button id="brush-tool" aria-pressed="true">Mask</button><button id="erase-tool" aria-pressed="false">Erase</button></div><label class="brush-label">Size <input id="brush-size" type="range" min="2" max="48" value="12"><output id="brush-value">12 px</output></label><button id="undo">Undo</button><button id="clear-mask">Clear</button></div>
+        <div class="run-settings"><label>Image <select id="mode"><option value="rgb">RGB</option><option value="gray">Grayscale</option></select></label><label>Iterations <select id="iterations"><option value="200">200</option><option value="1000" selected>1,000</option><option value="4000">4,000</option></select></label></div>
+      </div>
+      <div class="canvases">
+        <div class="canvas-panel"><div class="canvas-heading"><h3>Corrupted image</h3><span id="missing-count">0% missing</span></div><div class="canvas-wrap" id="editor-wrap"><canvas id="editor" aria-label="Draw to mark missing pixels"></canvas></div><p class="canvas-caption">Draw to obscure pixel values.</p></div>
+        <div class="canvas-panel"><div class="canvas-heading"><h3>In-painted image</h3><span class="status-chip" id="run-status" aria-live="polite">Ready</span></div><div class="canvas-wrap result-wrap"><canvas id="result" aria-label="In-painted image; click to inspect pixel differences"></canvas><div id="result-placeholder"><span class="empty-symbol">x</span></div></div><div class="canvas-caption result-caption"><span>x<sup>k</sup></span><div class="segmented small"><button id="view-result" aria-pressed="true">In-painted</button><button id="view-original" aria-pressed="false">Original</button><button id="view-error" aria-pressed="false">Error ×5</button></div></div></div>
+      </div>
+      <div class="action-row"><div class="run-buttons"><button class="primary" id="run">Solve</button><button id="pause" disabled>Pause</button><button id="step">+10 iterations</button><button id="stop" disabled>Stop</button></div><button id="download-result" disabled>Export PNG</button></div>
+      <div class="metrics" aria-label="Current iterate"><div><span>Iteration k</span><strong id="metric-k">—</strong></div><div><span>TV(xᵏ)</span><strong id="metric-tv">—</strong></div><div><span>MSE · missing pixels</span><strong id="metric-mse">—</strong></div><div><span>Constraint residual</span><strong id="metric-known">—</strong></div></div>
+      <div class="timeline-row"><button id="playback" disabled>Play</button><input id="timeline" type="range" min="0" max="0" value="0" disabled aria-label="Iteration snapshots"><span id="frame-label">No iterates</span><button id="latest" disabled>Latest</button></div>
+      <div class="plot-heading"><h3>Convergence</h3><div><span class="legend-dot green"></span>TV(xᵏ) <span class="legend-dot orange"></span>Dual bound</div><button id="download-csv" class="text-button" disabled>CSV</button></div>
+      <svg id="chart" role="img" aria-label="Objective and dual bound versus iterations"></svg>
+    </section>
+  </div>
+  <details class="pixel-details"><summary>Pixel differences</summary>
+    <section class="math-section" aria-label="Local total variation">
+      <div class="model-explanation"><h2>Local contribution to TV(x)</h2><div class="formula"><math display="block"><mrow><msqrt><mrow><munder><mo>∑</mo><mi>c</mi></munder><mo stretchy="false">(</mo><msubsup><mi>d</mi><mrow><mi>v</mi><mo>,</mo><mi>c</mi></mrow><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>d</mi><mrow><mi>h</mi><mo>,</mo><mi>c</mi></mrow><mn>2</mn></msubsup><mo stretchy="false">)</mo></mrow></msqrt></mrow></math></div><p>dᵥ = xᵢ₊₁,ⱼ − xᵢⱼ<br>dₕ = xᵢ,ⱼ₊₁ − xᵢⱼ</p><p class="muted">Click the in-painted image to select (i, j).</p></div>
+      <div class="pixel-inspector"><div class="section-head"><h2>Pixel values</h2><span id="pixel-position">(i, j)</span></div><div class="pixel-top"><canvas id="pixel-patch" width="180" height="180" aria-label="Selected pixel and its neighbors"></canvas><div><p><span class="legend-dot orange"></span>xᵢⱼ</p><p><span class="legend-dot blue"></span>xᵢ₊₁,ⱼ</p><p><span class="legend-dot green"></span>xᵢ,ⱼ₊₁</p></div></div><div class="table-scroll"><table><thead><tr><th>Channel</th><th>xᵢⱼ</th><th>xᵢ₊₁,ⱼ</th><th>xᵢ,ⱼ₊₁</th><th>dᵥ</th><th>dₕ</th></tr></thead><tbody id="pixel-values"></tbody></table></div><p id="local-tv">‖(dᵥ, dₕ)‖₂</p><p class="muted pixel-note">Pixel table: 8-bit display values. Objective: full precision.</p></div>
+    </section>
+  </details>
+  <details id="how-to"><summary>Controls &amp; notes</summary><div class="help-grid"><div><h3>Demonstration</h3><p>Upload images, draw a mask, then Solve or advance by 10 iterations. Use the timeline to replay. Click the result to inspect local pixel differences.</p><p>TV need not decrease at every iteration. MSE compares with the original image and is not used by the solver.</p></div><div><h3>Save an experiment</h3><p>Save exports images, masks and recorded iterates as .tvlab.json. Open restores them. Export before closing this page.</p><p>Computation is local. TV favors smoothness; large missing regions may lose structure or texture.</p></div></div></details>
+  <footer><span>Image in-painting · v1.1.0</span><span>Chelsea: Stefan van der Walt · CC0</span></footer>
+</main>
+<input id="project-input" type="file" accept=".json,.tvlab.json" hidden>
+</body></html>
