@@ -11,7 +11,7 @@ Build the program archive from the project root:
 python3 tools/package.py
 ```
 
-This creates `dist/tv-inpainting-lab-v1.1.0.zip`, a SHA256 checksum and a per-file manifest. An explicit file list excludes `.venv`, personal `.tvlab.json` files and the original lecture PDF.
+This creates `dist/tv-inpainting-lab-v1.2.0.zip`, a SHA256 checksum and a per-file manifest. An explicit file list excludes `.venv`, personal `.tvlab.json` files and the original lecture PDF.
 
 ## Offline installation
 
@@ -33,7 +33,7 @@ An installed `.venv` works offline. Do not copy it across platforms. Requirement
 
 Target repository: https://github.com/hdong026/CVX_image_inpainting
 
-Download its ZIP or clone it, then follow README.md. GitHub Pages cannot execute the Python backend; run the application locally. Before pushing updates, review `git diff --cached` and include only distributable project files. `.gitignore` excludes environments, archives and personal experiments.
+Download its ZIP or clone it, then follow README.md. The browser edition in docs/ works on GitHub Pages without a Python backend; see DEPLOYMENT.md. Before pushing updates, review `git diff --cached` and include only distributable project files. `.gitignore` excludes environments, archives and personal experiments.
 
 ## Troubleshooting
 

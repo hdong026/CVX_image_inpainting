@@ -11,3 +11,7 @@ Version 1.1 uses English throughout the interface, runtime messages, launch scri
 Windows/Linux scripts are provided but have not been tested on those operating systems. No public deployment has been tested.
 
 Version 1.1 browser checks: English-only rendered text, mask creation, pause at k=10, resume to k=1000, pixel inspection, collapsed classroom view, and 1280/390 px layouts. No horizontal overflow was observed at 390 px.
+
+## Version 1.2 browser solver
+
+Five tests passed, including grayscale/RGB parity against the Python solver after 75 iterations (pixel tolerance 1e-12; metrics checked to 10 decimal places). Browser checks verified stepping to k=10, pausing/resuming, and independent RGB/grayscale images with no browser error logs.

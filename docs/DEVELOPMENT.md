@@ -26,3 +26,7 @@ Job images and masks are same-size PNG data URLs. White mask pixels are missing;
 At most two active jobs and eight job records are retained. Images and solver states stay in memory. The default binding is 127.0.0.1, intended for local classroom use rather than public multi-user hosting.
 
 Experiment schema 1 has an `images` array with `name`, `image`, `mask`, `mode`, `iterations`, `frames`, `frame`. Each frame contains a PNG and `iteration`, `tv`, `lower_bound`, `relative_gap`, `missing_mse`, `known_error`. Restore does not invoke the solver. Version 1.1 reads version 1.0 experiments.
+
+## Browser edition
+
+Run `python3 tools/build_web.py` to regenerate `docs/`. `browser-backend.js` handles image preparation locally and starts `solver-worker.js`; `solver-core.js` implements the same float64 PDHG updates as Python. The worker retains original values solely for MSE evaluation and the core discards values at missing pixels. Each visitor has independent jobs. No backend calls are made by the published website. Node.js is optional for cross-language parity tests; set `TV_LAB_NODE` to its executable path.

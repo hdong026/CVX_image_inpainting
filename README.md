@@ -2,23 +2,38 @@
 
 An interactive demonstration of **ℓ₂ total variation in-painting** for a convex optimization lecture. Upload images, obscure pixel values, and follow the optimization iterates.
 
-The interface follows the lecture notation: the original image is `x_orig`, and `K` is the set of indices corresponding to known pixel values. A local Python solver computes the iterates. No AI API, account or GPU is required.
+The interface follows the lecture notation: the original image is `x_orig`, and `K` is the set of indices corresponding to known pixel values. The browser edition computes iterates in a Web Worker; a Python reference implementation is included. No AI API, account or GPU is required.
 
-## Quick start
+## Open the website
 
-1. Download and extract the project.
-2. Install **Python 3.9–3.12** (3.12 recommended). On Windows, enable “Add Python to PATH”.
-3. Start the app: **macOS:** double-click `start.command`; **Windows:** double-click `start.bat`; **Linux:** run `sh start.sh`.
+**[Launch the live demo](https://cvx-image-inpainting-hdong026.silver-chick-5650.chatgpt.site)**
 
-Alternatively, open a terminal in this folder:
+The browser edition needs **no installation, Python, account or API key**. Each visitor's browser runs the same TV / PDHG optimization independently. Selected images stay on their device.
+
+## Deploy your own copy — GitHub Pages
+
+1. Open the repository's **Settings → Pages**.
+2. Select **Deploy from a branch**.
+3. Select **main → /docs → Save**.
+
+The complete static website is already in `docs/`; no build command or requirements installation is needed. GitHub will display the live link after publishing. See [deployment instructions](docs/DEPLOYMENT.md) for other static hosts.
+
+## Optional local Python version
+
+Python 3.9–3.12 (3.12 recommended). Double-click `start.command` on macOS or `start.bat` on Windows, or run:
 
 ```bash
 python3 launch.py
 ```
 
-On Windows, use `py -3.12 launch.py`. On macOS, use `python3.12 launch.py` if your default Python is outside the supported range.
+The launcher creates an isolated environment and installs [requirements.txt](requirements.txt). For manual setup:
 
-The first launch creates a project-local `.venv` and installs pinned dependencies. The browser opens **http://127.0.0.1:8765**. Subsequent launches work offline. Press **Ctrl+C** in the terminal to stop.
+```bash
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8765
+```
+
+Open **http://127.0.0.1:8765**. Press **Ctrl+C** to stop. The local Python version is optional; website visitors do not need it.
 
 ## Demonstration
 
@@ -36,10 +51,11 @@ TV need not decrease at every iteration. MSE uses the original only for evaluati
 
 **Export PNG** saves the selected iterate; **CSV** saves the numerical history. Export before refreshing or closing the page. Uploaded images remain in local memory and are not saved automatically.
 
-Limits: 8 images; PNG/JPEG/WebP; 20 MB and 24 megapixels per input; working long edge 128/256/512 px; imported experiments up to 64 MB. At most two jobs may be running or paused. For class, start with 256 px and 1,000 iterations.
+Limits: 8 images; PNG/JPEG/WebP; 20 MB and 24 megapixels per input; working long edge 128/256/512 px; imported experiments up to 64 MB. In the browser edition, each visitor can run or pause up to two jobs independently. For class, start with 256 px and 1,000 iterations.
 
 ## Documentation
 
+- [Quick deployment](docs/DEPLOYMENT.md)
 - [Classroom demonstration](docs/CLASSROOM.md)
 - [Formulation and algorithm](docs/MATH.md)
 - [Archiving and offline installation](docs/ARCHIVING.md)

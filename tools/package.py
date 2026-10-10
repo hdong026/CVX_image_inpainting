@@ -8,10 +8,10 @@ root = Path(__file__).resolve().parents[1]
 dist = root / 'dist'
 dist.mkdir(exist_ok=True)
 files = [p for folder in ('app', 'docs', 'tests', 'tools') for p in (root / folder).rglob('*')
-         if p.is_file() and '__pycache__' not in p.parts and p.suffix in ('.py', '.md', '.html', '.css', '.js', '.png')]
+         if p.is_file() and '__pycache__' not in p.parts and (p.suffix in ('.py', '.md', '.html', '.css', '.js', '.png') or p.name == '.nojekyll')]
 files += [root / name for name in ('README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', '.gitignore',
                                   'requirements.txt', 'requirements-dev.txt', 'launch.py', 'start.command', 'start.sh', 'start.bat')]
-archive = dist / 'tv-inpainting-lab-v1.1.0.zip'
+archive = dist / 'tv-inpainting-lab-v1.2.0.zip'
 manifest = {}
 with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as bundle:
     for path in sorted(files):

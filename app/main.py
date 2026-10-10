@@ -163,7 +163,7 @@ async def lifespan(app):
     pool.shutdown(wait=True)
 
 
-app = FastAPI(title='TV Inpainting Lab', version='1.1.0', lifespan=lifespan)
+app = FastAPI(title='TV Inpainting Lab', version='1.2.0', lifespan=lifespan)
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 
 
@@ -174,7 +174,7 @@ def index():
 
 @app.get('/api/health')
 def health():
-    return {'status': 'ok', 'version': '1.1.0', 'algorithm': 'PDHG / isotropic TV'}
+    return {'status': 'ok', 'version': '1.2.0', 'algorithm': 'PDHG / isotropic TV'}
 
 
 @app.get('/api/example')
