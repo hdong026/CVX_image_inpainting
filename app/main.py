@@ -163,7 +163,7 @@ async def lifespan(app):
     pool.shutdown(wait=True)
 
 
-app = FastAPI(title='TV Inpainting Lab', version='1.2.0', lifespan=lifespan)
+app = FastAPI(title='TV Inpainting Lab', version='1.3.0', lifespan=lifespan)
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 
 
@@ -174,12 +174,14 @@ def index():
 
 @app.get('/api/health')
 def health():
-    return {'status': 'ok', 'version': '1.2.0', 'algorithm': 'PDHG / isotropic TV'}
+    return {'status': 'ok', 'version': '1.3.0', 'algorithm': 'PDHG / isotropic TV'}
 
 
 @app.get('/api/example')
-def example():
-    image = decode_image((ROOT / 'assets' / 'chelsea.png').read_bytes(), 256)
+def example(max_side: int = 256):
+    if max_side not in (128, 256, 512):
+        raise HTTPException(422, 'Resolution must be 128, 256 or 512.')
+    image = decode_image((ROOT / 'assets' / 'chelsea.png').read_bytes(), max_side)
     return dict(name='Chelsea', width=image.shape[1], height=image.shape[0], image=png_url(image))
 
 

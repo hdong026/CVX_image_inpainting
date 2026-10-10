@@ -8,10 +8,14 @@ Version 1.0 browser checks covered masking, k=10 pause, k=1000 completion, image
 
 Version 1.1 uses English throughout the interface, runtime messages, launch scripts and documentation. It follows the lecture's “Examples: image in-painting” terminology and x_orig/K notation. The full formulation precedes the images; notes and pixel inspection are collapsed until needed. Solver and experiment schema are unchanged.
 
-Windows/Linux scripts are provided but have not been tested on those operating systems. No public deployment has been tested.
+Windows/Linux scripts are provided but have not been tested on those operating systems. The browser edition was subsequently deployed and checked in version 1.2.
 
 Version 1.1 browser checks: English-only rendered text, mask creation, pause at k=10, resume to k=1000, pixel inspection, collapsed classroom view, and 1280/390 px layouts. No horizontal overflow was observed at 390 px.
 
 ## Version 1.2 browser solver
 
 Five tests passed, including grayscale/RGB parity against the Python solver after 75 iterations (pixel tolerance 1e-12; metrics checked to 10 decimal places). Browser checks verified stepping to k=10, pausing/resuming, and independent RGB/grayscale images with no browser error logs.
+
+## Version 1.3 classroom controls
+
+All five automated tests passed again. Browser checks verified all three presets, mask replacement and Undo, disabled preset controls during a run, stepping to k=10, resuming to k=1000, and the selected-iterate gap updating when replaying k=0. With the 451 × 300 Chelsea example, thin scratches reached a relative gap of approximately 0.000738% at k=1000. Random 70% at k=200 showed approximately 4.95% and correctly reported “Iteration limit”. Presets retain the bottom-right pixel; the underlying TV solver and saved-experiment schema are unchanged.

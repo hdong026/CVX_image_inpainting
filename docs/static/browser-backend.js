@@ -24,9 +24,11 @@
   }
   function send(job,packet){if(job.listener)job.listener(packet);else job.buffer.push(packet);}
   async function request(url,options={}){
-    if(url==='/api/example'){
+    if(url.split('?')[0]==='/api/example'){
+      const maxSide=+(new URL(url,location.href).searchParams.get('max_side')||256);
+      if(![128,256,512].includes(maxSide))throw Error('Resolution must be 128, 256 or 512.');
       const r=await fetch(exampleURL);if(!r.ok)throw Error('Example image unavailable.');
-      return prepare(await r.blob(),256,'Chelsea');
+      return prepare(await r.blob(),maxSide,'Chelsea');
     }
     if(url==='/api/prepare')return prepare(options.body.get('file'),+options.body.get('max_side'),options.body.get('file').name);
     const body=JSON.parse(options.body||'{}');

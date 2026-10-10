@@ -1,5 +1,7 @@
 # Quick deployment
 
+Current hosted classroom edition: [open the live demo](https://cvx-image-inpainting-hdong026.silver-chick-5650.chatgpt.site). Version 1.3 adds missing-pixel presets and a relative-gap display. The hosted URL remains the same when updated.
+
 ## Recommended: static browser edition
 
 The `docs/` folder is a complete website. The TV solver runs in a Web Worker on each visitor's device. No Python server, database, API key or build service is needed. User images are read locally and are not uploaded to the host.
