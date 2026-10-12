@@ -21,7 +21,7 @@ On Windows, replace `.venv/bin/python` with `.venv\Scripts\python.exe`. API docu
 | GET `/api/jobs/{id}?after=-1` | Status and subsequent iterates |
 | WS `/api/jobs/{id}/stream?after=-1` | Stream status and iterates |
 
-Job images and masks are same-size PNG data URLs. White mask pixels are missing; black pixels are known. Mode: `rgb`/`gray`; iterations: 10–4000. `step` advances ten iterations before pausing.
+Job images and masks are same-size PNG data URLs. White mask pixels are missing; black pixels are known. Mode: `rgb`/`gray`; iterations: 10–4000. `step` advances up to ten iterations before pausing or converging. Both schedulers check relative gap ≤ 0.001 every ten iterations; they publish the final frame and complete immediately on convergence.
 
 At most two active jobs and eight job records are retained. Images and solver states stay in memory. The default binding is 127.0.0.1, intended for local classroom use rather than public multi-user hosting.
 

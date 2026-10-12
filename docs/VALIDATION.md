@@ -23,3 +23,7 @@ All five automated tests passed again. Browser checks verified all three presets
 ## Version 1.4 custom masks and gallery (2026-10-12)
 
 All five automated tests passed, now also checking all five example API responses, resolution limits and invalid example names. Browser checks covered the default 70% random mask, custom 35%, zero missing pixels, rejection of 100% without changing the mask, custom two-line text, all five bundled images, disabled inputs during a run, k=10 stepping and completion on Lena at k=1000. The Lena text example reached a relative gap of approximately 0.00229%. No browser error logs were observed. The generated `docs/` edition uses relative URLs for assets, image credits and its Web Worker so it can be hosted under a GitHub Pages repository subpath.
+
+## Version 1.5
+
+Six automated tests passed, including the actual browser worker scheduler stopping below its 1,000-iteration cap at relative gap ≤ 0.001, a separate iteration-budget case, and matching Python early-stop iteration. Direct thumbnail selection loaded Lena immediately. In the browser, Lena at 512 px with Thin scratches stopped at k=330 (gap 0.0988%); replay reached k=0 and switching to Camera and back preserved Lena's result. All four comparison panels remain present, and no browser error logs were observed. Versioned script and worker URLs prevent reuse of older solver assets after deployment.

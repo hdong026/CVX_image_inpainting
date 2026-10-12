@@ -37,13 +37,13 @@ Open **http://127.0.0.1:8765**. Press **Ctrl+C** to stop. The local Python versi
 
 ## Demonstration
 
-1. **Upload** images, or select **Chelsea**, **Lena**, **Astronaut**, **Camera**, or **Coffee** under **Examples**, then **Add example**.
+1. **Upload** images, or select **Chelsea**, **Lena**, **Astronaut**, **Camera**, or **Coffee** under **Examples**, then a sample thumbnail.
 2. Enter a **Random** missing percentage (whole number 0–99, default **70**) and click its **Apply** button. Or enter a custom **Text** watermark (1–3 lines, up to 120 characters) and click its **Apply** button. **Thin scratches** and the default **3 px** brush are also available. Changing a field does not alter an existing mask until **Apply** is clicked. Presets replace the mask; **Undo** restores it. Missing pixels appear black. **Erase** and **Clear** also edit the mask.
 3. Select **Solve**, or **+10 iterations** to advance and pause.
 4. Use the timeline to compare iterates. Switch between **In-painted**, **Original**, and **Error ×5**.
 5. Click the in-painted image to inspect the pixel differences in the TV objective.
 
-**Relative gap** measures optimization accuracy: `(TV − dual bound) / max(1, TV)`, displayed as a percentage for the selected iterate. At the end of a run, **Gap ≤ 0.1%** means the objective is near optimal; **Iteration limit** means the budget ended above this tolerance. Computation still runs to the selected iteration count so the full trajectory can be replayed. This is not a percentage of pixels repaired.
+**Relative gap** measures optimization accuracy: `(TV − dual bound) / max(1, TV)`, displayed as a percentage for the selected iterate. At the end of a run, **Converged ≤ 0.1%** means the objective is near optimal; **Iteration limit** means the budget ended above this tolerance. The solver checks every 10 iterations and stops as soon as the relative gap is ≤ 0.1%; **Max iterations** is an upper limit. Recorded iterates remain available for replay. This is not a percentage of pixels repaired.
 
 TV need not decrease at every iteration. MSE uses the original only for evaluation; the solver receives no original values at missing pixels. A small gap does not guarantee a visually accurate reconstruction of a large missing region.
 
@@ -55,7 +55,7 @@ The presets follow the [CVXPY TV in-painting example](https://www.cvxpy.org/exam
 
 **Export PNG** saves the selected iterate; **CSV** saves the numerical history. Export before refreshing or closing the page. Uploaded images remain in local memory and are not saved automatically.
 
-Limits: 8 images; PNG/JPEG/WebP; 20 MB and 24 megapixels per input; working long edge capped at 128/256/512 px; imported experiments up to 64 MB. In the browser edition, each visitor can run or pause up to two jobs independently. The default resolution cap is 512 px; smaller images are not enlarged. Resolution applies to the next upload or **Add example**. For class, start with **Text** or **Thin scratches** and 1,000 iterations. Use 256 px on slower machines.
+Limits: 8 images; PNG/JPEG/WebP; 20 MB and 24 megapixels per input; working long edge capped at 128/256/512 px; imported experiments up to 64 MB. In the browser edition, each visitor can run or pause up to two jobs independently. The default resolution cap is 512 px; smaller images are not enlarged. Resolution applies to the next upload or a sample thumbnail. For class, start with **Text** or **Thin scratches** and 1,000 iterations. Use 256 px on slower machines.
 
 ## Documentation
 
@@ -68,3 +68,5 @@ Limits: 8 images; PNG/JPEG/WebP; 20 MB and 24 megapixels per input; working long
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 
 Python + FastAPI + NumPy; native HTML/CSS/JavaScript Canvas. No Node.js build step. Code: MIT. Sample image credits and source-specific rights are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Original lecture slides and personal experiments are not distributed.
+
+Sample thumbnails stay visible; click one to load it immediately. Selecting it again at the same resolution preserves its mask and iterates. Original, corrupted, in-painted, and difference images are always shown together. The heatmap is the mean absolute channel error against the original, computed from 8-bit display images, on a fixed 0–0.2 scale (brighter means larger error; values ≥0.2 saturate). It updates with the selected replay frame; CSV metrics use full precision.

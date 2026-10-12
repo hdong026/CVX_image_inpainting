@@ -43,7 +43,7 @@ L(p)=\sum_{(i,j)\in K,c}q_{ijc}x^{\mathrm{orig}}_{ijc}
 +\sum_{(i,j)\notin K,c}\min(q_{ijc},0).
 ```
 
-The interface and CSV include `relative_gap = max(0, TV - lower_bound) / max(1, TV)`. The interface displays this as a percentage for the selected iterate. Floating-point errors may affect the bound. At the iteration budget, “Gap ≤ 0.1%” means this quantity is at most 0.001; otherwise the status is “Iteration limit”. The solver does not stop early at this tolerance, preserving the requested trajectory for teaching. These are numerical objective-accuracy indicators, not exact optimality certificates or image-quality scores. The timeline records early and subsequently sampled iterates, not every iteration.
+The interface and CSV include `relative_gap = max(0, TV - lower_bound) / max(1, TV)`. The interface displays this as a percentage for the selected iterate. Floating-point errors may affect the bound. Every 10 iterations, the solver checks this quantity and stops when it is at most 0.001 (“Converged ≤ 0.1%”). The chosen maximum remains a hard cap; “Iteration limit” means it ended above the tolerance. These are numerical objective-accuracy indicators, not exact optimality certificates or image-quality scores. The timeline records early and subsequently sampled iterates, not every iteration.
 
 ## Pixel differences
 

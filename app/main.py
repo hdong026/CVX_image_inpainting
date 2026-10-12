@@ -118,6 +118,8 @@ class Job:
                         self.budget -= 1
                 self.solver.step()
                 k = self.solver.iteration
+                if k % 10 == 0 and self.solver.metrics()['relative_gap'] <= .001:
+                    break
                 if (k in (1, 2, 5, 10, 20, 50, 100) or k % self.interval == 0
                         or k == self.iterations or (self.paused and self.budget == 0)):
                     self.publish()
@@ -163,7 +165,8 @@ async def lifespan(app):
     pool.shutdown(wait=True)
 
 
-app = FastAPI(title='TV Inpainting Lab', version='1.4.0', lifespan=lifespan)
+app = FastAPI(title='TV Inpainting Lab', version='1.5.0', lifespan=lifespan)
+app.mount('/assets', StaticFiles(directory=ROOT / 'assets'), name='assets')
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 
 
@@ -174,7 +177,7 @@ def index():
 
 @app.get('/api/health')
 def health():
-    return {'status': 'ok', 'version': '1.4.0', 'algorithm': 'PDHG / isotropic TV'}
+    return {'status': 'ok', 'version': '1.5.0', 'algorithm': 'PDHG / isotropic TV'}
 
 
 @app.get('/api/example')

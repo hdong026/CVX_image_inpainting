@@ -11,8 +11,8 @@ for asset in (root/'app/assets').iterdir():
     if asset.suffix in ('.png','.jpg'):
         shutil.copy2(asset,out/'assets'/asset.name)
 html=(root/'app/static/index.html').read_text()
-html=html.replace('href="/"','href="./"').replace('="/static/','="./static/')
-html=html.replace('<script src="./static/app.js" defer></script>','<script src="./static/browser-backend.js" defer></script>\n  <script src="./static/app.js" defer></script>')
+html=html.replace('href="/"','href="./"').replace('="/static/','="./static/').replace('="/assets/','="./assets/')
+html=html.replace('<script src="./static/app.js?v=1.5.0" defer></script>','<script src="./static/browser-backend.js?v=1.5.0" defer></script>\n  <script src="./static/app.js?v=1.5.0" defer></script>')
 html=html.replace('Computation is local.','Images and computation stay in your browser.')
 (out/'index.html').write_text(html)
 (out/'.nojekyll').write_text('')

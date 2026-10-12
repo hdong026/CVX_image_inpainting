@@ -27,6 +27,7 @@ function tick(){
     while(solver.iteration<end){
       solver.step();if(budget>0)budget--;
       const k=solver.iteration;
+      if(k%10===0 && solver.metrics().relative_gap<=.001){publish('complete');return;}
       if([1,2,5,10,20,50,100].includes(k)||k%Math.max(10,Math.ceil(total/100))===0)publish('running');
     }
     schedule();

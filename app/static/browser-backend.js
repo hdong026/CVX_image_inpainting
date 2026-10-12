@@ -3,7 +3,7 @@
   'use strict';
   const jobs=new Map();
   const scriptURL=document.currentScript.src;
-  const workerURL=new URL('./solver-worker.js',scriptURL);
+  const workerURL=new URL('./solver-worker.js?v=1.5.0',scriptURL);
   const examples={chelsea:['chelsea.png','Chelsea'],lena:['lena.jpg','Lena'],astronaut:['astronaut.png','Astronaut'],camera:['camera.png','Camera'],coffee:['coffee.png','Coffee']};
   const image=src=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(Error('Could not read image.'));im.src=src;});
   function context(width,height){const c=document.createElement('canvas');c.width=width;c.height=height;return c.getContext('2d',{willReadFrequently:true});}
