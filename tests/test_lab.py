@@ -23,9 +23,19 @@ class SolverTests(unittest.TestCase):
         s=TVSolver(np.ones((8,8,1)),known);s.step(20);self.assertEqual(s.u[-1,-1,0],0)
 
 class APITests(unittest.TestCase):
+    def check_example_gallery(self, client):
+        for name in ('chelsea', 'lena', 'astronaut', 'camera', 'coffee'):
+            response = client.get('/api/example', params={'name': name, 'max_side': 128})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(max(response.json()['width'], response.json()['height']), 128)
+            self.assertTrue(response.json()['image'].startswith('data:image/png;base64,'))
+        self.assertEqual(client.get('/api/example', params={'name': '../main.py'}).status_code, 422)
+        self.assertEqual(client.get('/api/example', params={'max_side': 999}).status_code, 422)
+
     def test_upload_and_step(self):
         import base64
         with TestClient(app) as client:
+            self.check_example_gallery(client)
             self.assertEqual(client.get('/api/health').status_code,200)
             raw=base64.b64decode(png_url(np.full((16,20,3),.7)).split(',')[1])
             r=client.post('/api/prepare',files={'file':('test.png',raw,'image/png')},data={'max_side':128})

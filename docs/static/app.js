@@ -18,7 +18,7 @@ function invalidate(i){i.frames=[];i.frame=0;i.status='idle';i.job=null;i.result
 function stopPlayback(){clearInterval(playback);playback=null;$('playback').textContent='Play';}
 function renderLibrary(){const box=$('image-list');box.replaceChildren();for(const i of items){const b=document.createElement('button');b.className='image-card'+(i.id===selected?' selected':'');b.setAttribute('aria-pressed',String(i.id===selected));const im=document.createElement('img');im.src=i.original;im.alt='';const span=document.createElement('span');span.textContent=i.name;b.append(im,span);b.onclick=()=>{stopPlayback();selected=i.id;view='result';render();};box.append(b);}$('image-count').textContent=`${items.length} / 8`;}
 function renderEditor(){const i=current(),c=$('editor');if(!i){c.getContext('2d').clearRect(0,0,c.width,c.height);return;}c.width=i.width;c.height=i.height;const p=sourcePixels(i),m=maskPixels(i);let missing=0;for(let n=0;n<p.data.length;n+=4)if(m.data[n+3]>127){missing++;p.data[n]=p.data[n+1]=p.data[n+2]=0;}c.getContext('2d').putImageData(p,0,0);$('missing-count').textContent=`${(100*missing/(i.width*i.height)).toFixed(1)}% missing`;}
-function renderControls(){const i=current(),busy=active(i),has=!!i?.frames.length;for(const id of ['run','step','remove-image','clear-mask','undo','mode','iterations','preset-random','preset-text','preset-scratches'])$(id).disabled=!i||(busy&&!['step','remove-image'].includes(id));$('step').disabled=!i||(busy&&i.status!=='paused');$('pause').disabled=!busy;$('stop').disabled=!busy;$('pause').textContent=i?.status==='paused'?'Resume':'Pause';for(const id of ['download-result','download-csv','playback','timeline','latest','view-result','view-original','view-error'])$(id).disabled=!has;const labels={idle:'Ready',queued:'Queued',running:'Solving',paused:'Paused',complete:i?.frames.at(-1)?.relative_gap<=.001?'Gap ≤ 0.1%':'Iteration limit',cancelled:'Stopped',error:'Interrupted',restored:'Restored'};$('run-status').textContent=labels[i?.status]||'No image';$('timeline').max=Math.max(0,(i?.frames.length||1)-1);$('timeline').value=i?.frame||0;}
+function renderControls(){const i=current(),busy=active(i),has=!!i?.frames.length;for(const id of ['run','step','remove-image','clear-mask','undo','mode','iterations','preset-random','preset-text','preset-scratches','random-percent','watermark-text'])$(id).disabled=!i||(busy&&!['step','remove-image'].includes(id));$('step').disabled=!i||(busy&&i.status!=='paused');$('pause').disabled=!busy;$('stop').disabled=!busy;$('pause').textContent=i?.status==='paused'?'Resume':'Pause';for(const id of ['download-result','download-csv','playback','timeline','latest','view-result','view-original','view-error'])$(id).disabled=!has;const labels={idle:'Ready',queued:'Queued',running:'Solving',paused:'Paused',complete:i?.frames.at(-1)?.relative_gap<=.001?'Gap ≤ 0.1%':'Iteration limit',cancelled:'Stopped',error:'Interrupted',restored:'Restored'};$('run-status').textContent=labels[i?.status]||'No image';$('timeline').max=Math.max(0,(i?.frames.length||1)-1);$('timeline').value=i?.frame||0;}
 async function renderFrame(){const token=++renderToken,i=current(),f=i?.frames[i.frame];$('result-placeholder').hidden=!!f;for(const [id,key] of [['metric-k','iteration'],['metric-tv','tv'],['metric-mse','missing_mse'],['metric-gap','relative_gap']])$(id).textContent=f?(key==='iteration'?f[key]:key==='tv'?f[key].toFixed(2):key==='relative_gap'?(100*f[key]).toPrecision(3)+'%':f[key].toExponential(2)):'—';$('frame-label').textContent=f?`k = ${f.iteration} · ${i.frame+1}/${i.frames.length}`:'No iterates';const c=$('result');if(!f){c.getContext('2d').clearRect(0,0,c.width,c.height);$('pixel-values').replaceChildren();$('local-tv').textContent='‖(dᵥ, dₕ)‖₂';$('pixel-patch').getContext('2d').clearRect(0,0,180,180);return;}const im=await loadImage(f.image);if(token!==renderToken)return;i.resultPixels=pixels(im);c.width=i.width;c.height=i.height;const p=new ImageData(new Uint8ClampedArray(i.resultPixels.data),i.width,i.height),orig=sourcePixels(i);if(view==='original')p.data.set(orig.data);if(view==='error')for(let n=0;n<p.data.length;n+=4)for(let k=0;k<3;k++)p.data[n+k]=5*Math.abs(p.data[n+k]-orig.data[n+k]);c.getContext('2d').putImageData(p,0,0);inspect(i,i.inspectX??Math.floor(i.width/2),i.inspectY??Math.floor(i.height/2));}
 function render(){for(const m of ['result','original','error'])$('view-'+m).setAttribute('aria-pressed',String(m===view));renderLibrary();const i=current();$('image-name').textContent=i?.name||'Upload an image';$('image-dimensions').textContent=i?`${i.width} × ${i.height} px`:'';if(i){$('mode').value=i.mode;$('iterations').value=i.iterations;}renderEditor();renderControls();renderFrame().catch(e=>notice(e.message));chart();}
 function point(c,e){const r=c.getBoundingClientRect(),scale=Math.min(r.width/c.width,r.height/c.height),w=c.width*scale,h=c.height*scale;return{x:Math.max(0,Math.min(c.width-1,(e.clientX-r.left-(r.width-w)/2)/scale)),y:Math.max(0,Math.min(c.height-1,(e.clientY-r.top-(r.height-h)/2)/scale))};}
@@ -39,21 +39,25 @@ $('brush-size').oninput=()=>{$('brush-value').textContent=$('brush-size').value+
 
 function applyPreset(kind){
   const i=current();if(!i||active(i))return;
+  const percent=$('random-percent').valueAsNumber, text=$('watermark-text').value.trim();
+  if(kind==='random'&&(!Number.isInteger(percent)||percent<0||percent>99)){notice('Enter a whole-number percentage from 0 to 99.');$('random-percent').focus();return;}
+  if(kind==='text'&&(!text||text.length>120||text.split(/\n/).length>3)){notice('Enter 1–3 lines of text, up to 120 characters.');$('watermark-text').focus();return;}
+  $('notice').hidden=true;
   i.undo.push(maskPixels(i));if(i.undo.length>12)i.undo.shift();
   const ctx=i.mask.getContext('2d'),w=i.width,h=i.height;
   ctx.save();ctx.globalCompositeOperation='source-over';ctx.clearRect(0,0,w,h);ctx.fillStyle='white';ctx.strokeStyle='white';
   if(kind==='random'){
     // Fixed seed: reapplying the preset gives the same spatial mask.
     let seed=1;const p=ctx.createImageData(w,h);
-    for(let n=0;n<w*h;n++){seed=(Math.imul(1664525,seed)+1013904223)>>>0;if(seed/4294967296<.7){p.data.set([255,255,255,255],4*n);}}
+    for(let n=0;n<w*h;n++){seed=(Math.imul(1664525,seed)+1013904223)>>>0;if(seed/4294967296<percent/100){p.data.set([255,255,255,255],4*n);}}
     ctx.putImageData(p,0,0);
   }else if(kind==='text'){
     ctx.textAlign='center';ctx.textBaseline='middle';
-    const lines=['CONVEX OPTIMIZATION','MISSING PIXELS'];
+    const lines=text.split(/\n/);
     let size=Math.min(w*.065,h*.14);ctx.font=`${size}px sans-serif`;
     const scale=Math.min(1,w*.86/Math.max(...lines.map(t=>ctx.measureText(t).width)));
     ctx.font=`${size*scale}px sans-serif`;
-    lines.forEach((t,n)=>ctx.fillText(t,w/2,h*(.42+.20*n)));
+    lines.forEach((t,n)=>ctx.fillText(t,w/2,h*(.5+(n-(lines.length-1)/2)*.20)));
   }else{
     ctx.lineWidth=Math.max(1,Math.round(w/256));ctx.lineCap='round';
     for(const [x1,y1,x2,y2] of [[.12,.26,.85,.61],[.16,.69,.81,.33],[.35,.14,.61,.83]]){
@@ -63,7 +67,7 @@ function applyPreset(kind){
   // Match the binary mask consumed by both solvers; keep the unconstrained corner known.
   const p=ctx.getImageData(0,0,w,h);let count=0;
   for(let n=0;n<w*h;n++){const a=p.data[n*4+3]>127?255:0;p.data.set([255,255,255,a],n*4);if(a)count++;}
-  if(!count)p.data.set([255,255,255,255],4*(Math.floor(h/2)*w+Math.floor(w/2)));
+  if(!count&&kind!=='random')p.data.set([255,255,255,255],4*(Math.floor(h/2)*w+Math.floor(w/2)));
   p.data[4*(w*h-1)+3]=0;ctx.putImageData(p,0,0);ctx.restore();
   invalidate(i);view='result';render();
 }
@@ -74,7 +78,7 @@ $('clear-mask').onclick=()=>{const i=current();if(i){i.undo.push(maskPixels(i));
 for(const key of ['mode','iterations'])$(key).onchange=()=>{const i=current();if(i){i[key]=key==='iterations'?+$(key).value:$(key).value;invalidate(i);render();}};
 $('remove-image').onclick=guarded(async()=>{const i=current();if(!i)return;if(active(i))await control('cancel');i.job=null;i.socket?.close();items.splice(items.indexOf(i),1);selected=items[0]?.id;render();});
 $('upload-button').onclick=()=>$('file-input').click();$('file-input').onchange=guarded(async e=>{for(const file of e.target.files){if(file.size>20*1024*1024){notice(`${file.name} exceeds 20 MB.`);continue;}const form=new FormData();form.append('file',file);form.append('max_side',$('resolution').value);await addImage(await api('/api/prepare',{method:'POST',body:form}));}e.target.value='';});
-$('add-example').onclick=guarded(async()=>addImage(await api('/api/example?max_side='+$('resolution').value)));
+$('add-example').onclick=guarded(async()=>addImage(await api('/api/example?max_side='+$('resolution').value+'&name='+encodeURIComponent($('example-select').value))));
 function selectFrame(n){const i=current();if(!i)return;i.follow=false;i.frame=n;renderControls();renderFrame();chart();}
 $('timeline').oninput=()=>{stopPlayback();selectFrame(+$('timeline').value);};$('latest').onclick=()=>{const i=current();if(i){i.follow=true;i.frame=i.frames.length-1;renderControls();renderFrame();chart();}};
 $('playback').onclick=()=>{if(playback){stopPlayback();return;}const i=current();if(!i?.frames.length)return;if(i.frame===i.frames.length-1)i.frame=0;$('playback').textContent='Pause replay';playback=setInterval(()=>{if(i.frame>=i.frames.length-1){stopPlayback();return;}selectFrame(i.frame+1);},180);};
@@ -82,8 +86,8 @@ for(const mode of ['result','original','error'])$('view-'+mode).onclick=()=>{vie
 function download(content,name,type){const a=document.createElement('a'),url=typeof content==='string'&&content.startsWith('data:')?content:URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;a.click();if(url.startsWith('blob:'))setTimeout(()=>URL.revokeObjectURL(url),3000);}
 $('download-result').onclick=()=>{const i=current(),f=i?.frames[i.frame];if(f)download(f.image,`tv-result-k${f.iteration}.png`);};
 $('download-csv').onclick=()=>{const i=current();if(!i?.frames.length)return;const cols=['iteration','tv','lower_bound','relative_gap','missing_mse','known_error'];download(cols.join(',')+'\n'+i.frames.map(f=>cols.map(k=>f[k]).join(',')).join('\n'),'tv-metrics.csv','text/csv');};
-$('save-project').onclick=()=>{const data={schema_version:1,app_version:'1.3.0',created:new Date().toISOString(),images:items.map(i=>({name:i.name,image:i.original,mask:maskURL(i),mode:i.mode,iterations:i.iterations,frames:i.frames,frame:i.frame}))};download(JSON.stringify(data),'experiment.tvlab.json','application/json');notice('Experiment exported.');};
+$('save-project').onclick=()=>{const data={schema_version:1,app_version:'1.4.0',created:new Date().toISOString(),images:items.map(i=>({name:i.name,image:i.original,mask:maskURL(i),mode:i.mode,iterations:i.iterations,frames:i.frames,frame:i.frame}))};download(JSON.stringify(data),'experiment.tvlab.json','application/json');notice('Experiment exported.');};
 $('import-project').onclick=()=>$('project-input').click();
 $('project-input').onchange=guarded(async e=>{const file=e.target.files[0];if(!file)return;if(file.size>64*1024*1024)throw Error('Experiment exceeds 64 MB.');const data=JSON.parse(await file.text());if(data.schema_version!==1||!Array.isArray(data.images)||!data.images.length||data.images.length>8)throw Error('Unsupported experiment file.');if(items.length+data.images.length>8)throw Error('Maximum 8 images. Save and remove some images before importing.');const prepared=[];for(const obj of data.images){const valid=s=>typeof s==='string'&&s.startsWith('data:image/png;base64,')&&s.length<=4000000;if(!valid(obj.image)||!valid(obj.mask)||!['rgb','gray'].includes(obj.mode)||![200,1000,4000].includes(obj.iterations)||!Array.isArray(obj.frames)||obj.frames.length>500)throw Error('Invalid experiment data.');const im=await loadImage(obj.image),mask=await loadImage(obj.mask);if(Math.min(im.width,im.height)<8||Math.max(im.width,im.height)>512||im.width!==mask.width||im.height!==mask.height)throw Error('Invalid image dimensions.');for(const f of obj.frames){if(!valid(f.image)||!['iteration','tv','lower_bound','relative_gap','missing_mse','known_error'].every(k=>typeof f[k]==='number'&&Number.isFinite(f[k])))throw Error('Invalid iterate data.');const fi=await loadImage(f.image);if(fi.width!==im.width||fi.height!==im.height)throw Error('Iterate dimensions do not match.');}prepared.push({obj,mask});}for(const {obj,mask} of prepared){const i=await addImage(obj);i.mode=obj.mode;i.iterations=obj.iterations;const p=pixels(mask);for(let n=0;n<p.data.length;n+=4){const a=p.data[n]>127?255:0;p.data[n]=p.data[n+1]=p.data[n+2]=255;p.data[n+3]=a;}i.mask.getContext('2d').putImageData(p,0,0);i.frames=obj.frames;i.frame=Math.max(0,Math.min(i.frames.length-1,Number.isInteger(obj.frame)?obj.frame:0));i.status=i.frames.length?'restored':'idle';}render();e.target.value='';notice('Experiment restored.');});
 window.addEventListener('beforeunload',e=>{if(items.some(i=>i.frames.length||i.undo.length)){e.preventDefault();e.returnValue='';}});
-guarded(async()=>addImage(await api('/api/example?max_side='+$('resolution').value)))();
+guarded(async()=>addImage(await api('/api/example?max_side='+$('resolution').value+'&name='+encodeURIComponent($('example-select').value))))();

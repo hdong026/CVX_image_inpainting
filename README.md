@@ -6,11 +6,11 @@ The interface follows the lecture notation: the original image is `x_orig`, and 
 
 ## Open the website
 
-**[Launch the live demo](https://cvx-image-inpainting-hdong026.silver-chick-5650.chatgpt.site)**
+**[Launch the live demo](https://hdong026.github.io/CVX_image_inpainting/)**
 
 The browser edition needs **no installation, Python, account or API key**. Each visitor's browser runs the same TV / PDHG optimization independently. Selected images stay on their device.
 
-## Deploy your own copy — GitHub Pages
+## Hosting — GitHub Pages
 
 1. Open the repository's **Settings → Pages**.
 2. Select **Deploy from a branch**.
@@ -37,8 +37,8 @@ Open **http://127.0.0.1:8765**. Press **Ctrl+C** to stop. The local Python versi
 
 ## Demonstration
 
-1. **Upload** images, or use **Add example**.
-2. Choose **Random 70%**, **Text**, or **Thin scratches**, or draw with the default **3 px** brush. Presets replace the mask; **Undo** restores it. Missing pixels appear black. **Erase** and **Clear** also edit the mask.
+1. **Upload** images, or select **Chelsea**, **Lena**, **Astronaut**, **Camera**, or **Coffee** under **Examples**, then **Add example**.
+2. Enter a **Random** missing percentage (whole number 0–99, default **70**) and click its **Apply** button. Or enter a custom **Text** watermark (1–3 lines, up to 120 characters) and click its **Apply** button. **Thin scratches** and the default **3 px** brush are also available. Changing a field does not alter an existing mask until **Apply** is clicked. Presets replace the mask; **Undo** restores it. Missing pixels appear black. **Erase** and **Clear** also edit the mask.
 3. Select **Solve**, or **+10 iterations** to advance and pause.
 4. Use the timeline to compare iterates. Switch between **In-painted**, **Original**, and **Error ×5**.
 5. Click the in-painted image to inspect the pixel differences in the TV objective.
@@ -47,7 +47,7 @@ Open **http://127.0.0.1:8765**. Press **Ctrl+C** to stop. The local Python versi
 
 TV need not decrease at every iteration. MSE uses the original only for evaluation; the solver receives no original values at missing pixels. A small gap does not guarantee a visually accurate reconstruction of a large missing region.
 
-The presets follow the [CVXPY TV in-painting example](https://www.cvxpy.org/examples/applications/tv_inpainting.html): scattered missing pixels and thin text strokes are easier to reconstruct than broad contiguous masks. **Random 70%** uses a fixed seed, approximately 70% missing spatial pixels, and the same mask across RGB channels. The supplied photograph and random generator differ from the official example. The bottom-right pixel is kept known because it is absent from the displayed shared-interior TV sum.
+The presets follow the [CVXPY TV in-painting example](https://www.cvxpy.org/examples/applications/tv_inpainting.html): scattered missing pixels and thin text strokes are easier to reconstruct than broad contiguous masks. **Random** uses a fixed seed and the requested approximate percentage of missing spatial pixels, and the same mask across RGB channels. The supplied photograph and random generator differ from the official example. The bottom-right pixel is kept known because it is absent from the displayed shared-interior TV sum.
 
 ## Save and restore
 
@@ -67,4 +67,4 @@ Limits: 8 images; PNG/JPEG/WebP; 20 MB and 24 megapixels per input; working long
 - [Validation](docs/VALIDATION.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 
-Python + FastAPI + NumPy; native HTML/CSS/JavaScript Canvas. No Node.js build step. Code: MIT. Example image: CC0. Original lecture slides and personal experiments are not distributed.
+Python + FastAPI + NumPy; native HTML/CSS/JavaScript Canvas. No Node.js build step. Code: MIT. Sample image credits and source-specific rights are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Original lecture slides and personal experiments are not distributed.

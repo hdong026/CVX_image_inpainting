@@ -1,6 +1,6 @@
 # Quick deployment
 
-Current hosted classroom edition: [open the live demo](https://cvx-image-inpainting-hdong026.silver-chick-5650.chatgpt.site). Version 1.3 adds missing-pixel presets and a relative-gap display. The hosted URL remains the same when updated.
+Current classroom edition: [open on GitHub Pages](https://hdong026.github.io/CVX_image_inpainting/). Version 1.4 includes customizable masks and five sample images. The repository itself is the deployment source.
 
 ## Recommended: static browser edition
 
@@ -12,7 +12,7 @@ The `docs/` folder is a complete website. The TV solver runs in a Web Worker on 
 2. Under **Build and deployment**, select **Deploy from a branch**.
 3. Select **main** and **/docs**, then **Save**.
 
-Wait for GitHub to show the published URL. For this repository, the standard project URL is `https://hdong026.github.io/CVX_image_inpainting/` once Pages has been enabled. Do not assume it is live before GitHub confirms publication.
+Wait for GitHub to show the published URL. For this repository, the project URL is `https://hdong026.github.io/CVX_image_inpainting/`. A fork uses its own owner and repository name.
 
 The `.nojekyll` file serves these files directly. Relative asset and Worker paths also work under a project subpath. Subsequent pushes to `main` update the site.
 

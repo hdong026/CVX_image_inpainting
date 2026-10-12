@@ -19,3 +19,7 @@ Five tests passed, including grayscale/RGB parity against the Python solver afte
 ## Version 1.3 classroom controls
 
 All five automated tests passed again. Browser checks verified all three presets, mask replacement and Undo, disabled preset controls during a run, stepping to k=10, resuming to k=1000, and the selected-iterate gap updating when replaying k=0. With the 451 × 300 Chelsea example, thin scratches reached a relative gap of approximately 0.000738% at k=1000. Random 70% at k=200 showed approximately 4.95% and correctly reported “Iteration limit”. Presets retain the bottom-right pixel; the underlying TV solver and saved-experiment schema are unchanged.
+
+## Version 1.4 custom masks and gallery (2026-10-12)
+
+All five automated tests passed, now also checking all five example API responses, resolution limits and invalid example names. Browser checks covered the default 70% random mask, custom 35%, zero missing pixels, rejection of 100% without changing the mask, custom two-line text, all five bundled images, disabled inputs during a run, k=10 stepping and completion on Lena at k=1000. The Lena text example reached a relative gap of approximately 0.00229%. No browser error logs were observed. The generated `docs/` edition uses relative URLs for assets, image credits and its Web Worker so it can be hosted under a GitHub Pages repository subpath.

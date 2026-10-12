@@ -4,7 +4,7 @@
   const jobs=new Map();
   const scriptURL=document.currentScript.src;
   const workerURL=new URL('./solver-worker.js',scriptURL);
-  const exampleURL=new URL('../assets/chelsea.png',scriptURL);
+  const examples={chelsea:['chelsea.png','Chelsea'],lena:['lena.jpg','Lena'],astronaut:['astronaut.png','Astronaut'],camera:['camera.png','Camera'],coffee:['coffee.png','Coffee']};
   const image=src=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(Error('Could not read image.'));im.src=src;});
   function context(width,height){const c=document.createElement('canvas');c.width=width;c.height=height;return c.getContext('2d',{willReadFrequently:true});}
   function pixels(im){const ctx=context(im.width,im.height);ctx.fillStyle='#fff';ctx.fillRect(0,0,im.width,im.height);ctx.drawImage(im,0,0);return ctx.getImageData(0,0,im.width,im.height).data;}
@@ -27,8 +27,11 @@
     if(url.split('?')[0]==='/api/example'){
       const maxSide=+(new URL(url,location.href).searchParams.get('max_side')||256);
       if(![128,256,512].includes(maxSide))throw Error('Resolution must be 128, 256 or 512.');
-      const r=await fetch(exampleURL);if(!r.ok)throw Error('Example image unavailable.');
-      return prepare(await r.blob(),maxSide,'Chelsea');
+      const name=new URL(url,location.href).searchParams.get('name')||'chelsea';
+      if(!Object.hasOwn(examples,name))throw Error('Unknown example.');
+      const [file,label]=examples[name];
+      const r=await fetch(new URL('../assets/'+file,scriptURL));if(!r.ok)throw Error('Example image unavailable.');
+      return prepare(await r.blob(),maxSide,label);
     }
     if(url==='/api/prepare')return prepare(options.body.get('file'),+options.body.get('max_side'),options.body.get('file').name);
     const body=JSON.parse(options.body||'{}');
