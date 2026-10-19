@@ -39,7 +39,7 @@ Open **http://127.0.0.1:8765**. Press **Ctrl+C** to stop. The local Python versi
 
 1. **Upload** images or click a permanent **Examples** thumbnail. The five photographs are joined by **Checkerboard**, **Shepp–Logan**, **Page**, **Horse**, and **Brick**.
 2. Enter a **Random** missing percentage (whole number 0–99, default **70**) and click its **Apply** button. Or enter a custom **Text** watermark (1–3 lines, up to 120 characters) and click its **Apply** button. **Thin scratches** and the default **3 px** brush are also available. Changing a field does not alter an existing mask until **Apply** is clicked. Presets replace the mask; **Undo** restores it. Missing pixels appear black. **Erase** and **Clear** also edit the mask.
-3. Choose **L2 TV** (the lecture model) or **L1 TV** beside the formula. Select **Solve**, or **+10 iterations** to advance and pause.
+3. Choose **L2 TV** (the lecture model) or **L1 TV** at the top of the page. Select **Solve**, or **+10 iterations** to advance and pause.
 4. Use the timeline to compare iterates. Original, corrupted, in-painted and difference heatmap remain visible together.
 5. Click the in-painted image to inspect the pixel differences in the TV objective.
 
@@ -55,7 +55,7 @@ Both buttons change the actual objective, dual projection and pixel inspector. *
 
 Slide 15's L2 objective, shared-interior difference convention and known-pixel constraints match. The app normalizes to [0,1] and adds a displayed box constraint. RGB groups all direction/channel components in one norm; grayscale is the most direct comparison with the slide formula. L1 is an additional model, not the original slide's L2 formulation.
 
-Switching norms preserves the image and mask, clears the old run, and requires **Solve** again. Export a run before switching if you want to retain both histories. The same mask gives a fair comparison; primal values for different objectives are not directly comparable. Compare image errors and edges after each mode has sufficiently converged.
+The large **L2 TV / L1 TV** tabs select separate example galleries: L2 shows the five original photographs; L1 shows Checkerboard, Shepp–Logan, Page, Horse and Brick. Switching back restores the last selected example with its mask and results. Uploaded images remain available in both modes. Switching the norm of an uploaded image preserves its mask, clears the old run, and requires **Solve** again. Export a run before switching if you want to retain both histories. To compare both norms on exactly the same image, upload that image and switch the top tabs. The same mask gives a fair comparison; primal values for different objectives are not directly comparable. Compare image errors and edges after each mode has sufficiently converged.
 
 | Example | What to discuss |
 | --- | --- |
