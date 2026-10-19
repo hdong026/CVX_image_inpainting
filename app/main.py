@@ -70,6 +70,7 @@ class JobInput(BaseModel):
     iterations: int = Field(default=1000, ge=10, le=4000)
     mode: Literal['rgb', 'gray'] = 'rgb'
     paused: bool = False
+    tv_norm: Literal['l1', 'l2'] = 'l2'
 
 
 class Control(BaseModel):
@@ -77,11 +78,11 @@ class Control(BaseModel):
 
 
 class Job:
-    def __init__(self, truth, known, iterations, paused=False):
+    def __init__(self, truth, known, iterations, paused=False, tv_norm="l2"):
         self.id = uuid.uuid4().hex
         self.created = time.monotonic()
         self.truth = truth
-        self.solver = TVSolver(np.where(known[..., None], truth, 0), known)
+        self.solver = TVSolver(np.where(known[..., None], truth, 0), known, tv_norm)
         self.iterations = iterations
         self.paused = paused
         self.budget = 0
@@ -165,7 +166,7 @@ async def lifespan(app):
     pool.shutdown(wait=True)
 
 
-app = FastAPI(title='TV Inpainting Lab', version='1.5.0', lifespan=lifespan)
+app = FastAPI(title='TV Inpainting Lab', version='1.6.0', lifespan=lifespan)
 app.mount('/assets', StaticFiles(directory=ROOT / 'assets'), name='assets')
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 
@@ -177,7 +178,7 @@ def index():
 
 @app.get('/api/health')
 def health():
-    return {'status': 'ok', 'version': '1.5.0', 'algorithm': 'PDHG / isotropic TV'}
+    return {'status': 'ok', 'version': '1.6.0', 'algorithm': 'PDHG / L1 or L2 TV'}
 
 
 @app.get('/api/example')
@@ -186,7 +187,8 @@ def example(max_side: int = 256, name: str = 'chelsea'):
         raise HTTPException(422, 'Resolution must be 128, 256 or 512.')
     examples = {'chelsea': ('chelsea.png', 'Chelsea'), 'lena': ('lena.jpg', 'Lena'),
                 'astronaut': ('astronaut.png', 'Astronaut'), 'camera': ('camera.png', 'Camera'),
-                'coffee': ('coffee.png', 'Coffee')}
+                'coffee': ('coffee.png', 'Coffee'),
+                'checkerboard': ('checkerboard.png', 'Checkerboard'), 'phantom': ('phantom.png', 'Shepp–Logan'), 'page': ('page.png', 'Page'), 'horse': ('horse.png', 'Horse'), 'brick': ('brick.png', 'Brick')}
     if name not in examples:
         raise HTTPException(422, 'Unknown example.')
     filename, label = examples[name]
@@ -230,7 +232,7 @@ def start_job(body: JobInput):
             finished = sorted((j for j in jobs.values() if j not in active), key=lambda j: j.created)
             while len(jobs) >= 8 and finished:
                 del jobs[finished.pop(0).id]
-            job = Job(truth, ~mask, body.iterations, body.paused)
+            job = Job(truth, ~mask, body.iterations, body.paused, body.tv_norm)
             jobs[job.id] = job
             pool.submit(job.run)
         return {'id': job.id, 'iterations': job.iterations}

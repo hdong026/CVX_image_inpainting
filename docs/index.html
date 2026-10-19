@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Image in-painting · Convex optimization</title>
-  <link rel="stylesheet" href="./static/style.css?v=1.5.0">
-  <script src="./static/browser-backend.js?v=1.5.0" defer></script>
-  <script src="./static/app.js?v=1.5.0" defer></script>
+  <link rel="stylesheet" href="./static/style.css?v=1.6.0">
+  <script src="./static/browser-backend.js?v=1.6.0" defer></script>
+  <script src="./static/app.js?v=1.6.0" defer></script>
 </head>
 <body>
 <header class="topbar">
@@ -13,18 +13,18 @@
   <div class="header-actions"><button id="import-project">Open</button><button id="save-project">Save</button><a class="help-link" href="#how-to">Help</a></div>
 </header>
 <main>
-  <section class="intro"><h1>Examples: image in-painting</h1><span class="lecture-label">ℓ₂ total variation</span></section>
+  <section class="intro"><h1>Examples: image in-painting</h1><span class="lecture-label" id="tv-label">L2 TV · isotropic</span></section>
   <section class="problem" aria-label="Optimization problem">
     <div class="problem-formula">
-      <math display="block"><mrow><munder><mo>min</mo><mi>x</mi></munder><mspace width=".8em"/><mi mathvariant="normal">TV</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow></munderover><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></munderover><msub><mrow><mo>‖</mo><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>x</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>,</mo><mi>j</mi></mrow></msub><mo>−</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd></mtr><mtr><mtd><msub><mi>x</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>‖</mo></mrow><mn>2</mn></msub></mrow></math>
-      <math display="block"><mrow><mtext>s.t.</mtext><mspace width=".8em"/><msub><mi>x</mi><mi>ij</mi></msub><mo>=</mo><msubsup><mi>x</mi><mi>ij</mi><mtext>orig</mtext></msubsup><mo>,</mo><mspace width=".5em"/><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>∈</mo><mi>K</mi><mspace width="1em"/><mo>;</mo><mspace width=".6em"/><mn>0</mn><mo>≤</mo><mi>x</mi><mo>≤</mo><mn>1</mn></mrow></math>
+      <math display="block"><mrow><munder><mo>min</mo><mi mathvariant="bold">x</mi></munder><mspace width=".8em"/><mi mathvariant="normal">TV</mi><mo stretchy="false">(</mo><mi mathvariant="bold">x</mi><mo stretchy="false">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow></munderover><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></munderover><msub><mrow><mo>‖</mo><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>x</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn><mo>,</mo><mi>j</mi></mrow></msub><mo>−</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd></mtr><mtr><mtd><msub><mi>x</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>x</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>‖</mo></mrow><mn id="formula-norm">2</mn></msub></mrow></math>
+      <math display="block"><mrow><mtext>s.t.</mtext><mspace width=".8em"/><msub><mi>x</mi><mi>ij</mi></msub><mo>=</mo><msubsup><mi>x</mi><mi>ij</mi><mtext>orig</mtext></msubsup><mo>,</mo><mspace width=".5em"/><mo stretchy="false">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>∈</mo><mi>K</mi><mspace width="1em"/><mo>;</mo><mspace width=".6em"/><mn>0</mn><mo>≤</mo><mi mathvariant="bold">x</mi><mo>≤</mo><mn>1</mn></mrow></math>
     </div>
-    <div class="problem-key"><p><b>K</b> Known pixel values</p><p><span class="legend-dot missing"></span>Missing pixels</p><small>Normalized intensities; box constraint added.</small></div>
+    <div class="problem-key"><p class="solver-label"><b>Solver</b> PDHG (Chambolle–Pock)</p><div class="segmented" aria-label="TV norm"><button id="tv-l2" aria-pressed="true">L2 TV</button><button id="tv-l1" aria-pressed="false">L1 TV</button></div><p><b>K</b> Known pixel values</p><p><span class="legend-dot missing"></span>Missing pixels</p><small>Normalized intensities; box constraint added.<br><span id="model-note">L2 TV as in the lecture; RGB uses a joint norm.</span></small></div>
   </section>
   <div id="notice" role="status" aria-live="polite" hidden></div>
   <div class="workspace">
     <aside class="library" aria-label="Images">
-      <div class="section-head"><h2>Images</h2><span id="image-count">0 / 8</span></div>
+      <div class="section-head"><h2>Images</h2><span id="image-count">0 / 16</span></div>
       <button id="upload-button" class="upload-button">＋ Upload</button>
       <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
       <label class="resolution-label" for="resolution">Resolution</label><select id="resolution"><option value="128">128 px</option><option value="256">256 px</option><option value="512" selected>512 px</option></select>
@@ -35,6 +35,11 @@
         <button class="example-card" data-example="astronaut" aria-pressed="false"><img src="./assets/astronaut.png" alt=""><span>Astronaut</span></button>
         <button class="example-card" data-example="camera" aria-pressed="false"><img src="./assets/camera.png" alt=""><span>Camera</span></button>
         <button class="example-card" data-example="coffee" aria-pressed="false"><img src="./assets/coffee.png" alt=""><span>Coffee</span></button>
+        <button class="example-card" data-example="checkerboard" aria-pressed="false"><img src="./assets/checkerboard.png" alt=""><span>Checkerboard</span></button>
+        <button class="example-card" data-example="phantom" aria-pressed="false"><img src="./assets/phantom.png" alt=""><span>Shepp–Logan</span></button>
+        <button class="example-card" data-example="page" aria-pressed="false"><img src="./assets/page.png" alt=""><span>Page</span></button>
+        <button class="example-card" data-example="horse" aria-pressed="false"><img src="./assets/horse.png" alt=""><span>Horse</span></button>
+        <button class="example-card" data-example="brick" aria-pressed="false"><img src="./assets/brick.png" alt=""><span>Brick</span></button>
       </div>
     </aside>
     <section class="experiment" aria-label="Image in-painting">
@@ -52,20 +57,20 @@ MISSING PIXELS</textarea><button id="preset-text" aria-label="Apply text mask">A
         <div class="canvas-panel"><div class="canvas-heading"><h3>Difference heatmap</h3></div><div class="canvas-wrap"><canvas id="difference" aria-label="Absolute difference from original"></canvas></div><div class="canvas-caption heat-caption"><span>mean<sub>c</sub> |x<sup>k</sup> − x<sub>orig</sub>|</span><span>0 <i class="heat-scale"></i> ≥ 0.2</span></div></div>
       </div>
       <div class="action-row"><div class="run-buttons"><button class="primary" id="run">Solve</button><button id="pause" disabled>Pause</button><button id="step">+10 iterations</button><button id="stop" disabled>Stop</button></div><button id="download-result" disabled>Export PNG</button></div>
-      <div class="metrics" aria-label="Current iterate"><div><span>Iteration k</span><strong id="metric-k">—</strong></div><div><span>TV(xᵏ)</span><strong id="metric-tv">—</strong></div><div><span>MSE · missing pixels</span><strong id="metric-mse">—</strong></div><div><span title="(TV − dual bound) / max(1, TV). Smaller is closer to optimal.">Relative gap</span><strong id="metric-gap">—</strong></div></div>
+      <div class="metrics" aria-label="Current iterate"><div><span>Iteration k</span><strong id="metric-k">—</strong></div><div><span>Primal value</span><strong id="metric-tv">—</strong></div><div><span>MSE · missing pixels</span><strong id="metric-mse">—</strong></div><div><span title="(primal value − dual value) / max(1, TV). Smaller is closer to optimal.">Relative gap</span><strong id="metric-gap">—</strong></div></div>
       <div class="timeline-row"><button id="playback" disabled>Play</button><input id="timeline" type="range" min="0" max="0" value="0" disabled aria-label="Iteration snapshots"><span id="frame-label">No iterates</span><button id="latest" disabled>Latest</button></div>
-      <div class="plot-heading"><h3>Convergence</h3><div><span class="legend-dot green"></span>TV(xᵏ) <span class="legend-dot orange"></span>Dual bound</div><button id="download-csv" class="text-button" disabled>CSV</button></div>
-      <svg id="chart" role="img" aria-label="Objective and dual bound versus iterations"></svg>
+      <div class="plot-heading"><h3>Convergence</h3><div><span class="legend-dot green"></span>Primal value <span class="legend-dot orange"></span>Dual value</div><button id="download-csv" class="text-button" disabled>CSV</button></div>
+      <svg id="chart" role="img" aria-label="Primal value and dual value versus iterations"></svg>
     </section>
   </div>
   <details class="pixel-details"><summary>Pixel differences</summary>
     <section class="math-section" aria-label="Local total variation">
-      <div class="model-explanation"><h2>Local contribution to TV(x)</h2><div class="formula"><math display="block"><mrow><msqrt><mrow><munder><mo>∑</mo><mi>c</mi></munder><mo stretchy="false">(</mo><msubsup><mi>d</mi><mrow><mi>v</mi><mo>,</mo><mi>c</mi></mrow><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>d</mi><mrow><mi>h</mi><mo>,</mo><mi>c</mi></mrow><mn>2</mn></msubsup><mo stretchy="false">)</mo></mrow></msqrt></mrow></math></div><p>dᵥ = xᵢ₊₁,ⱼ − xᵢⱼ<br>dₕ = xᵢ,ⱼ₊₁ − xᵢⱼ</p><p class="muted">Click the in-painted image to select (i, j).</p></div>
+      <div class="model-explanation"><h2>Local contribution to TV(x)</h2><div class="formula" id="local-formula-l2"><math display="block"><mrow><msqrt><mrow><munder><mo>∑</mo><mi>c</mi></munder><mo stretchy="false">(</mo><msubsup><mi>d</mi><mrow><mi>v</mi><mo>,</mo><mi>c</mi></mrow><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>d</mi><mrow><mi>h</mi><mo>,</mo><mi>c</mi></mrow><mn>2</mn></msubsup><mo stretchy="false">)</mo></mrow></msqrt></mrow></math></div><div class="formula" id="local-formula-l1" hidden><math display="block"><mrow><munder><mo>∑</mo><mi>c</mi></munder><mo>(</mo><mo>|</mo><msub><mi>d</mi><mrow><mi>v</mi><mo>,</mo><mi>c</mi></mrow></msub><mo>|</mo><mo>+</mo><mo>|</mo><msub><mi>d</mi><mrow><mi>h</mi><mo>,</mo><mi>c</mi></mrow></msub><mo>|</mo><mo>)</mo></mrow></math></div><p>dᵥ = xᵢ₊₁,ⱼ − xᵢⱼ<br>dₕ = xᵢ,ⱼ₊₁ − xᵢⱼ</p><p class="muted">Click the in-painted image to select (i, j).</p></div>
       <div class="pixel-inspector"><div class="section-head"><h2>Pixel values</h2><span id="pixel-position">(i, j)</span></div><div class="pixel-top"><canvas id="pixel-patch" width="180" height="180" aria-label="Selected pixel and its neighbors"></canvas><div><p><span class="legend-dot orange"></span>xᵢⱼ</p><p><span class="legend-dot blue"></span>xᵢ₊₁,ⱼ</p><p><span class="legend-dot green"></span>xᵢ,ⱼ₊₁</p></div></div><div class="table-scroll"><table><thead><tr><th>Channel</th><th>xᵢⱼ</th><th>xᵢ₊₁,ⱼ</th><th>xᵢ,ⱼ₊₁</th><th>dᵥ</th><th>dₕ</th></tr></thead><tbody id="pixel-values"></tbody></table></div><p id="local-tv">‖(dᵥ, dₕ)‖₂</p><p class="muted pixel-note">Pixel table: 8-bit display values. Objective: full precision.</p></div>
     </section>
   </details>
-  <details id="how-to"><summary>Controls &amp; notes</summary><div class="help-grid"><div><h3>Demonstration</h3><p>Upload images, choose a preset or draw a mask, then Solve or advance by 10 iterations. Use the timeline to replay. Click the result to inspect local pixel differences.</p><p>Relative gap = (TV − dual bound) / max(1, TV). Gap ≤ 0.1% indicates a near-optimal objective, not perfect reconstruction. Iteration limit means the budget was exhausted. TV need not decrease at every iteration. MSE is for evaluation only.</p></div><div><h3>Save an experiment</h3><p>Save exports images, masks and recorded iterates as .tvlab.json. Open restores them. Export before closing this page.</p><p>Presets replace the mask; Undo restores it. Random accepts 0–99% (default 70) and uses a fixed seed. Text accepts up to 3 lines and 120 characters. Apply replaces the mask; editing a field alone does not. Images and computation stay in your browser. TV favors smoothness; large missing regions may lose structure or texture.</p></div></div></details>
-  <footer><span>Image in-painting · v1.5.0</span><a href="./static/credits.html">Image credits</a></footer>
+  <details id="how-to"><summary>Controls &amp; notes</summary><div class="help-grid"><div><h3>Demonstration</h3><p>L2 TV uses the Euclidean norm of each local gradient; L1 TV adds its absolute components. L1 favors horizontal and vertical edges. Try Checkerboard, Page, Horse, Shepp–Logan or Brick with the same mask. Neither norm is best for every image. Switching norms keeps the mask and clears the previous run; press Solve again.</p><p>Upload images, choose a preset or draw a mask, then Solve or advance by 10 iterations. Use the timeline to replay. Click the result to inspect local pixel differences.</p><p>Relative gap = (primal value − dual value) / max(1, TV). Gap ≤ 0.1% indicates a near-optimal objective, not perfect reconstruction. Iteration limit means the budget was exhausted. TV need not decrease at every iteration. MSE is for evaluation only.</p></div><div><h3>Save an experiment</h3><p>Save exports images, masks and recorded iterates as .tvlab.json. Open restores them. Export before closing this page.</p><p>Presets replace the mask; Undo restores it. Random accepts 0–99% (default 70) and uses a fixed seed. Text accepts up to 3 lines and 120 characters. Apply replaces the mask; editing a field alone does not. Images and computation stay in your browser. TV favors smoothness; large missing regions may lose structure or texture.</p></div></div></details>
+  <footer><span>Image in-painting · v1.6.0</span><a href="./static/credits.html">Image credits</a></footer>
 </main>
 <input id="project-input" type="file" accept=".json,.tvlab.json" hidden>
 </body></html>

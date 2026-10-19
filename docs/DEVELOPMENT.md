@@ -16,16 +16,16 @@ On Windows, replace `.venv/bin/python` with `.venv\Scripts\python.exe`. API docu
 | GET `/api/health` | Version and health |
 | GET `/api/example` | Prepared example |
 | POST `/api/prepare` | Multipart `file`, `max_side` (128/256/512); returns PNG data URL |
-| POST `/api/jobs` | JSON `image`, `mask`, `mode`, `iterations`, `paused` |
+| POST `/api/jobs` | JSON `image`, `mask`, `mode`, `tv_norm`, `iterations`, `paused` |
 | POST `/api/jobs/{id}/control` | JSON `action`: pause/resume/step/cancel |
 | GET `/api/jobs/{id}?after=-1` | Status and subsequent iterates |
 | WS `/api/jobs/{id}/stream?after=-1` | Stream status and iterates |
 
-Job images and masks are same-size PNG data URLs. White mask pixels are missing; black pixels are known. Mode: `rgb`/`gray`; iterations: 10–4000. `step` advances up to ten iterations before pausing or converging. Both schedulers check relative gap ≤ 0.001 every ten iterations; they publish the final frame and complete immediately on convergence.
+Job images and masks are same-size PNG data URLs. White mask pixels are missing; black pixels are known. Mode: `rgb`/`gray`; TV norm: `l1`/`l2` (default `l2`); iterations: 10–4000. `step` advances up to ten iterations before pausing or converging. Both schedulers check relative gap ≤ 0.001 every ten iterations; they publish the final frame and complete immediately on convergence.
 
 At most two active jobs and eight job records are retained. Images and solver states stay in memory. The default binding is 127.0.0.1, intended for local classroom use rather than public multi-user hosting.
 
-Experiment schema 1 has an `images` array with `name`, `image`, `mask`, `mode`, `iterations`, `frames`, `frame`. Each frame contains a PNG and `iteration`, `tv`, `lower_bound`, `relative_gap`, `missing_mse`, `known_error`. Restore does not invoke the solver. Version 1.1 reads version 1.0 experiments.
+Experiment schema 1 has an `images` array with `name`, `image`, `mask`, `mode`, `tv_norm`, `iterations`, `frames`, `frame`. Each frame contains a PNG and `iteration`, `tv`, `lower_bound`, `relative_gap`, `missing_mse`, `known_error`. Restore does not invoke the solver. Older schema-1 files without `tv_norm` are restored as L2. The library accepts up to 16 images. CSV headers use `primal_value` and `dual_value`; JSON keeps `tv` and `lower_bound` for compatibility.
 
 ## Browser edition
 

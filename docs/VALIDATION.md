@@ -27,3 +27,9 @@ All five automated tests passed, now also checking all five example API response
 ## Version 1.5
 
 Six automated tests passed, including the actual browser worker scheduler stopping below its 1,000-iteration cap at relative gap ≤ 0.001, a separate iteration-budget case, and matching Python early-stop iteration. Direct thumbnail selection loaded Lena immediately. In the browser, Lena at 512 px with Thin scratches stopped at k=330 (gap 0.0988%); replay reached k=0 and switching to Camera and back preserved Lena's result. All four comparison panels remain present, and no browser error logs were observed. Versioned script and worker URLs prevent reuse of older solver assets after deployment.
+
+## Version 1.6 (2026-10-19)
+
+Eight automated tests passed. L1 and L2, in grayscale and RGB, were checked against independent CVXPY/CLARABEL optima: each primal value stayed above the optimum and each feasible dual value below it; final relative gaps were below 1e-4. JavaScript/Python 75-step iterates agree within 1e-12. Tests also cover hidden-value isolation, different L1/L2 penalties, all ten sample API responses, invalid norms and early stopping.
+
+Browser checks: all five new thumbnails load; L1 stepping pauses at k=10; norm buttons are disabled during a run; the formula and pixel inspector switch with the solver. At 128 px on Checkerboard with Thin scratches, L1 stopped at k=60 (gap 0.0895%, missing MSE 0.00197); L2 on the unchanged mask stopped at k=40 (gap 0.0544%, missing MSE 0.00440). These are illustrative results, not a general ranking. Brick with random 70% in L1 correctly reached the 1,000-iteration cap with a 1.03% gap. Saving and importing the experiment preserved the L1 mode, mask and complete history. No browser error logs were observed during these checks.

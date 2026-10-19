@@ -15,3 +15,9 @@ The main view contains the formulation, images and convergence plot. Pixel diffe
 Use the permanent **Examples** thumbnails to compare Chelsea, Lena, Astronaut, Camera and Coffee. Text accepts 1–3 lines and 120 characters; its font size fits the image automatically. Changing preset inputs leaves the mask unchanged until Apply. Save archives the resulting mask and images; these global preset input fields reset to their defaults on a fresh page.
 
 Click any permanent sample thumbnail to display it. Compare the four panels throughout the run and replay: original, corrupted, in-painted and absolute-error heatmap. The heatmap uses a fixed 0–0.2 intensity-error scale, so colors remain comparable across iterates.
+
+## Comparing gradient norms
+
+Start with Checkerboard in Grayscale at 128 or 256 px. Apply Thin scratches, solve in L2, inspect corners, and export the result/CSV. Switch to L1 and solve with the unchanged mask. Compare corners and the heatmap once both gaps are small. Next try Page (fine text), Horse (silhouette), Shepp–Logan (curved boundaries), and Brick (straight lines plus texture). These are established scikit-image examples across several image types, not a claim that L1 is best on each.
+
+The two curves are **Primal value** and **Dual value**. Their gap bounds optimization error for the chosen model. Different norms define different objective scales; compare reconstruction errors and visual structure across modes, not their raw primal values.

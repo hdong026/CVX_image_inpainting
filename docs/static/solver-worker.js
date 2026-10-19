@@ -1,5 +1,5 @@
 'use strict';
-importScripts('./solver-core.js');
+importScripts('./solver-core.js?v=1.6.0');
 let solver, truth, total, paused, budget=0, cancelled=false, pending=false, last=-1, index=0;
 function publish(status) {
   let frame=null;
@@ -36,7 +36,7 @@ function tick(){
 onmessage=e=>{
   const m=e.data;
   if(m.type==='init'){
-    truth=Float64Array.from(m.truth);solver=new TVSolver(truth,m.known,m.width,m.height,m.channels);
+    truth=Float64Array.from(m.truth);solver=new TVSolver(truth,m.known,m.width,m.height,m.channels,m.tv_norm);
     total=m.iterations;paused=m.paused;publish(paused?'paused':'running');schedule();
   }else if(solver){
     if(m.action==='pause'){paused=true;budget=0;}

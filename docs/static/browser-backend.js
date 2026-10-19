@@ -3,8 +3,8 @@
   'use strict';
   const jobs=new Map();
   const scriptURL=document.currentScript.src;
-  const workerURL=new URL('./solver-worker.js?v=1.5.0',scriptURL);
-  const examples={chelsea:['chelsea.png','Chelsea'],lena:['lena.jpg','Lena'],astronaut:['astronaut.png','Astronaut'],camera:['camera.png','Camera'],coffee:['coffee.png','Coffee']};
+  const workerURL=new URL('./solver-worker.js?v=1.6.0',scriptURL);
+  const examples={chelsea:['chelsea.png','Chelsea'],lena:['lena.jpg','Lena'],astronaut:['astronaut.png','Astronaut'],camera:['camera.png','Camera'],coffee:['coffee.png','Coffee'],checkerboard:['checkerboard.png','Checkerboard'],phantom:['phantom.png','Shepp–Logan'],page:['page.png','Page'],horse:['horse.png','Horse'],brick:['brick.png','Brick']};
   const image=src=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(Error('Could not read image.'));im.src=src;});
   function context(width,height){const c=document.createElement('canvas');c.width=width;c.height=height;return c.getContext('2d',{willReadFrequently:true});}
   function pixels(im){const ctx=context(im.width,im.height);ctx.fillStyle='#fff';ctx.fillRect(0,0,im.width,im.height);ctx.drawImage(im,0,0);return ctx.getImageData(0,0,im.width,im.height).data;}
@@ -36,6 +36,8 @@
     if(url==='/api/prepare')return prepare(options.body.get('file'),+options.body.get('max_side'),options.body.get('file').name);
     const body=JSON.parse(options.body||'{}');
     if(url==='/api/jobs'){
+      body.tv_norm ??= 'l2';
+      if(!['l1','l2'].includes(body.tv_norm))throw Error('TV norm must be l1 or l2.');
       if([...jobs.values()].filter(j=>!j.done).length>=2)throw Error('Two jobs are active. Complete or stop one first.');
       const im=await image(body.image),mask=await image(body.mask);
       if(im.width!==mask.width||im.height!==mask.height)throw Error('Mask and image dimensions must match.');
@@ -58,7 +60,7 @@
         send(job,{id,status,error,iterations:body.iterations,frames});
       };
       worker.onerror=()=>{job.done=true;worker.terminate();send(job,{status:'error',error:'Browser solver failed. Try a lower resolution.',frames:[]});};
-      worker.postMessage({type:'init',truth,known,width:im.width,height:im.height,channels,iterations:body.iterations,paused:body.paused},[truth.buffer,known.buffer]);
+      worker.postMessage({type:'init',truth,known,width:im.width,height:im.height,channels,tv_norm:body.tv_norm,iterations:body.iterations,paused:body.paused},[truth.buffer,known.buffer]);
       return {id,iterations:body.iterations};
     }
     const match=url.match(/^\/api\/jobs\/([^/]+)\/control$/);
