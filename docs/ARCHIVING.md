@@ -11,7 +11,7 @@ Build the program archive from the project root:
 python3 tools/package.py
 ```
 
-This creates `dist/tv-inpainting-lab-v1.6.2.zip`, a SHA256 checksum and a per-file manifest. An explicit file list excludes `.venv`, personal `.tvlab.json` files and the original lecture PDF.
+This creates `dist/tv-inpainting-lab-v1.6.3.zip`, a SHA256 checksum and a per-file manifest. An explicit file list excludes `.venv`, personal `.tvlab.json` files and the original lecture PDF.
 
 ## Offline installation
 
