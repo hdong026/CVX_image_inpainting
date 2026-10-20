@@ -31,4 +31,6 @@ Experiment schema 1 has an `images` array with `name`, `image`, `mask`, `mode`, 
 
 Run `python3 tools/build_web.py` to regenerate `docs/`. `browser-backend.js` handles image preparation locally and starts `solver-worker.js`; `solver-core.js` implements the same float64 PDHG updates as Python. The worker retains original values solely for MSE evaluation and the core discards values at missing pixels. Each visitor has independent jobs. No backend calls are made by the published website. Node.js is optional for cross-language parity tests; set `TV_LAB_NODE` to its executable path.
 
-Version 1.6.1 adds optional `exampleGroup` (`l1`/`l2`) to saved items for mode-specific example libraries. It must match `tv_norm`. Missing groups are treated as uploaded/shared images. The last imported item selects the active mode.
+Version 1.6.1 adds optional `exampleGroup` (`l1`/`l2`) to saved items for example recommendations. It is a teaching recommendation independent of `tv_norm`. Missing groups are treated as uploaded/shared images. The last imported item selects the active mode.
+
+Version 1.6.2 saves optional `exampleKey` as `name:resolution:norm` to restore bundled examples without duplicate sidebar entries. Older files remain accessible as compact text entries.

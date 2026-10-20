@@ -1,5 +1,5 @@
 'use strict';
-importScripts('./solver-core.js?v=1.6.1');
+importScripts('./solver-core.js?v=1.6.2');
 let solver, truth, total, paused, budget=0, cancelled=false, pending=false, last=-1, index=0;
 function publish(status) {
   let frame=null;

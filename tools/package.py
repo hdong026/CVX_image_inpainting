@@ -11,7 +11,7 @@ files = [p for folder in ('app', 'docs', 'tests', 'tools') for p in (root / fold
          if p.is_file() and '__pycache__' not in p.parts and (p.suffix in ('.py', '.md', '.html', '.css', '.js', '.png', '.jpg') or p.name == '.nojekyll')]
 files += [root / name for name in ('README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', '.gitignore',
                                   'requirements.txt', 'requirements-dev.txt', 'launch.py', 'start.command', 'start.sh', 'start.bat')]
-archive = dist / 'tv-inpainting-lab-v1.6.1.zip'
+archive = dist / 'tv-inpainting-lab-v1.6.2.zip'
 manifest = {}
 with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as bundle:
     for path in sorted(files):

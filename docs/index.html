@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Image in-painting · Convex optimization</title>
-  <link rel="stylesheet" href="./static/style.css?v=1.6.1">
-  <script src="./static/browser-backend.js?v=1.6.1" defer></script>
-  <script src="./static/app.js?v=1.6.1" defer></script>
+  <link rel="stylesheet" href="./static/style.css?v=1.6.2">
+  <script src="./static/browser-backend.js?v=1.6.2" defer></script>
+  <script src="./static/app.js?v=1.6.2" defer></script>
 </head>
 <body>
 <header class="topbar">
@@ -29,17 +29,17 @@
       <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
       <label class="resolution-label" for="resolution">Resolution</label><select id="resolution"><option value="128">128 px</option><option value="256">256 px</option><option value="512" selected>512 px</option></select>
       <div id="image-list"></div>
-      <h3 class="example-label" id="examples-heading">L2 examples</h3><div id="example-gallery">
-        <button class="example-card" data-example="chelsea" aria-pressed="false"><img src="./assets/chelsea.png" alt=""><span>Chelsea</span></button>
-        <button class="example-card" data-example="lena" aria-pressed="false"><img src="./assets/lena.jpg" alt=""><span>Lena</span></button>
-        <button class="example-card" data-example="astronaut" aria-pressed="false"><img src="./assets/astronaut.png" alt=""><span>Astronaut</span></button>
-        <button class="example-card" data-example="camera" aria-pressed="false"><img src="./assets/camera.png" alt=""><span>Camera</span></button>
-        <button class="example-card" data-example="coffee" aria-pressed="false"><img src="./assets/coffee.png" alt=""><span>Coffee</span></button>
-        <button class="example-card" data-example="checkerboard" hidden aria-pressed="false"><img src="./assets/checkerboard.png" alt=""><span>Checkerboard</span></button>
-        <button class="example-card" data-example="phantom" hidden aria-pressed="false"><img src="./assets/phantom.png" alt=""><span>Shepp–Logan</span></button>
-        <button class="example-card" data-example="page" hidden aria-pressed="false"><img src="./assets/page.png" alt=""><span>Page</span></button>
-        <button class="example-card" data-example="horse" hidden aria-pressed="false"><img src="./assets/horse.png" alt=""><span>Horse</span></button>
-        <button class="example-card" data-example="brick" hidden aria-pressed="false"><img src="./assets/brick.png" alt=""><span>Brick</span></button>
+      <h3 class="example-label" id="examples-heading">Examples</h3><div id="example-gallery">
+        <button class="example-card" data-example="chelsea" aria-pressed="false"><img src="./assets/chelsea.png" alt=""><span>Chelsea (L2)</span></button>
+        <button class="example-card" data-example="lena" aria-pressed="false"><img src="./assets/lena.jpg" alt=""><span>Lena (L2)</span></button>
+        <button class="example-card" data-example="astronaut" aria-pressed="false"><img src="./assets/astronaut.png" alt=""><span>Astronaut (L2)</span></button>
+        <button class="example-card" data-example="camera" aria-pressed="false"><img src="./assets/camera.png" alt=""><span>Camera (L2)</span></button>
+        <button class="example-card" data-example="coffee" aria-pressed="false"><img src="./assets/coffee.png" alt=""><span>Coffee (L2)</span></button>
+        <button class="example-card" data-example="checkerboard" aria-pressed="false"><img src="./assets/checkerboard.png" alt=""><span>Checkerboard (L1)</span></button>
+        <button class="example-card" data-example="phantom" aria-pressed="false"><img src="./assets/phantom.png" alt=""><span>Shepp–Logan (L1)</span></button>
+        <button class="example-card" data-example="page" aria-pressed="false"><img src="./assets/page.png" alt=""><span>Page (L1)</span></button>
+        <button class="example-card" data-example="horse" aria-pressed="false"><img src="./assets/horse.png" alt=""><span>Horse (L1)</span></button>
+        <button class="example-card" data-example="brick" aria-pressed="false"><img src="./assets/brick.png" alt=""><span>Brick (L1)</span></button>
       </div>
     </aside>
     <section class="experiment" aria-label="Image in-painting">
@@ -69,8 +69,8 @@ MISSING PIXELS</textarea><button id="preset-text" aria-label="Apply text mask">A
       <div class="pixel-inspector"><div class="section-head"><h2>Pixel values</h2><span id="pixel-position">(i, j)</span></div><div class="pixel-top"><canvas id="pixel-patch" width="180" height="180" aria-label="Selected pixel and its neighbors"></canvas><div><p><span class="legend-dot orange"></span>xᵢⱼ</p><p><span class="legend-dot blue"></span>xᵢ₊₁,ⱼ</p><p><span class="legend-dot green"></span>xᵢ,ⱼ₊₁</p></div></div><div class="table-scroll"><table><thead><tr><th>Channel</th><th>xᵢⱼ</th><th>xᵢ₊₁,ⱼ</th><th>xᵢ,ⱼ₊₁</th><th>dᵥ</th><th>dₕ</th></tr></thead><tbody id="pixel-values"></tbody></table></div><p id="local-tv">‖(dᵥ, dₕ)‖₂</p><p class="muted pixel-note">Pixel table: 8-bit display values. Objective: full precision.</p></div>
     </section>
   </details>
-  <details id="how-to"><summary>Controls &amp; notes</summary><div class="help-grid"><div><h3>Demonstration</h3><p>L2 TV uses the Euclidean norm of each local gradient; L1 TV adds its absolute components. L1 favors horizontal and vertical edges. Try Checkerboard, Page, Horse, Shepp–Logan or Brick with the same mask. Neither norm is best for every image. Each mode has its own example gallery; switching back restores that example’s mask and results. Uploaded images remain available in both modes; switching their norm keeps the mask and clears the previous run.</p><p>Upload images, choose a preset or draw a mask, then Solve or advance by 10 iterations. Use the timeline to replay. Click the result to inspect local pixel differences.</p><p>Relative gap = (primal value − dual value) / max(1, TV). Gap ≤ 0.1% indicates a near-optimal objective, not perfect reconstruction. Iteration limit means the budget was exhausted. TV need not decrease at every iteration. MSE is for evaluation only.</p></div><div><h3>Save an experiment</h3><p>Save exports images, masks and recorded iterates as .tvlab.json. Open restores them. Export before closing this page.</p><p>Presets replace the mask; Undo restores it. Random accepts 0–99% (default 70) and uses a fixed seed. Text accepts up to 3 lines and 120 characters. Apply replaces the mask; editing a field alone does not. Images and computation stay in your browser. TV favors smoothness; large missing regions may lose structure or texture.</p></div></div></details>
-  <footer><span>Image in-painting · v1.6.1</span><a href="./static/credits.html">Image credits</a></footer>
+  <details id="how-to"><summary>Controls &amp; notes</summary><div class="help-grid"><div><h3>Demonstration</h3><p>L2 TV uses the Euclidean norm of each local gradient; L1 TV adds its absolute components. L1 favors horizontal and vertical edges. Try Checkerboard, Page, Horse, Shepp–Logan or Brick with the same mask. Neither norm is best for every image. All examples stay visible. Labels indicate suggested teaching examples, not a restriction on the solver. Changing mode selects a matching example; any example can be solved in either mode. Results are retained separately for each mode. Uploaded images remain available in both modes; switching their norm keeps the mask and clears the previous run.</p><p>Upload images, choose a preset or draw a mask, then Solve or advance by 10 iterations. Use the timeline to replay. Click the result to inspect local pixel differences.</p><p>Relative gap = (primal value − dual value) / max(1, TV). Gap ≤ 0.1% indicates a near-optimal objective, not perfect reconstruction. Iteration limit means the budget was exhausted. TV need not decrease at every iteration. MSE is for evaluation only.</p></div><div><h3>Save an experiment</h3><p>Save exports images, masks and recorded iterates as .tvlab.json. Open restores them. Export before closing this page.</p><p>Presets replace the mask; Undo restores it. Random accepts 0–99% (default 70) and uses a fixed seed. Text accepts up to 3 lines and 120 characters. Apply replaces the mask; editing a field alone does not. Images and computation stay in your browser. TV favors smoothness; large missing regions may lose structure or texture.</p></div></div></details>
+  <footer><span>Image in-painting · v1.6.2</span><a href="./static/credits.html">Image credits</a></footer>
 </main>
 <input id="project-input" type="file" accept=".json,.tvlab.json" hidden>
 </body></html>
